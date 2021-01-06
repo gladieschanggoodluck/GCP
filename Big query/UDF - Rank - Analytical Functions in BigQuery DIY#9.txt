@@ -1,0 +1,39 @@
+##-------------UDF Temporary function - Returns specifies data type returned by the UDF------------------------------------
+##-------------Language specifies the language of the function, AS specifies the code to be run--------------------------
+Create temporary function my_temp_func(name STRING)
+RETURNS STRING 
+LANGUAGE js AS """ return "Mr. " + name;  """;
+
+select my_temp_func('John') as Display
+;
+
+
+
+
+##-----------------The RANK() FUNCTION---------------------------------------------
+
+select county, 
+       category_name,
+       sum(sale_dollars) as sales,
+       rank() over (partition by county order by sum(sale_dollars) desc) as rank
+
+from `bigquery-public-data.iowa_liquor_sales.sales`
+where county is not null
+group by county, 
+       category_name
+order by 1
+;
+
+
+##----------------------Analytical Functions in BigQuery----------------------------------------
+
+select 
+stddev(sale_dollars) as standard_deviation ,
+corr( volume_sold_liters, sale_dollars) as correlation
+
+from `bigquery-public-data.iowa_liquor_sales.sales`
+
+;
+
+
+

@@ -1,0 +1,68 @@
+##-------------------------The WITH Statement-----------------
+With Emp as
+(
+Select 1 as EmpNo, 'Jack' as EmpName, 35 as Age, 'HR' as DeptNm
+ union all
+Select 2 as EmpNo, 'Jill' as EmpName, 37 as Age, 'HR' as DeptNm
+ union all
+Select 3 as EmpNo, 'David' as EmpName, 27 as Age, 'HR' as DeptNm
+ union all
+Select 4 as EmpNo, 'George' as EmpName, 26 as Age, 'IT' as DeptNm )
+,
+Dept as 
+(
+Select 'HR' as DeptNm, 'Riya' as aDeptHr
+union all
+select 'IT' as DeptNm, 'Devna' as DeptHr) 
+
+select emp.*, 
+from Emp join Dept
+using(DeptNm)
+;
+
+s
+
+
+
+##----------------------------COMMON TABLE EXPRESSIONS-----------------------------
+WITH rank_county as (
+
+select county, 
+       category_name,
+       sum(sale_dollars) as sales,
+       rank() over (partition by county order by sum(sale_dollars) desc) as rank_col
+
+from `bigquery-public-data.iowa_liquor_sales.sales`
+where county is not null
+group by county, 
+       category_name
+order by 1
+)
+
+select * 
+from rank_county
+where rank_col = 1
+;
+
+
+##------------------------Daily top 2 counties--------------------------------------
+
+With Rank_Date as (
+
+select date,
+       county,
+       sum(bottles_sold) as sales,
+       rank() over (partition by date order by sum(bottles_sold) desc) as calc_rank
+
+from `bigquery-public-data.iowa_liquor_sales.sales`
+where county is not null
+group by date, county 
+order by 1
+)
+
+Select * 
+from Rank_date
+where calc_rank <=2 
+;
+
+
